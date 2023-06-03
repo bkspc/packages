@@ -1,0 +1,22 @@
+#!/bin/sh
+DEVICE=/dev/ttyUSB0
+
+set_led() {
+  local VALUE=$(( ($1 - 1) / 20 + 1 ))
+  local i=1
+  while [ $i -le 5 ]; do
+    if [ $i -lt $(( $VALUE + 1 )) ]; then
+      echo 1 > "/sys/class/leds/blue:signal$i/brightness"
+    else
+      echo 0 > "/sys/class/leds/blue:signal$i/brightness"
+    fi
+    i=$((i+1))
+  done
+}
+
+[ ! -e "$DEVICE" ] && return 0
+CSQ=$(sms_tool -d $DEVICE at AT+CSQ | grep CSQ | awk -F[,\ ] '/^\+CSQ/ {print $2}')
+[ "x$CSQ" = "x" ] && return 0
+CSQ_PER=$(($CSQ*100/31))
+
+set_led $CSQ_PER

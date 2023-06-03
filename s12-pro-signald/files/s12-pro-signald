@@ -1,0 +1,8 @@
+#!/bin/sh
+
+(
+  while :; do
+    /sbin/update_s12_leds
+    sleep 60
+  done
+) &
